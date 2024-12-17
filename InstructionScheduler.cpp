@@ -74,6 +74,44 @@ void InstructionScheduler::execute_instruction(const DInstruction& ins) {
         result = input_values[0] * input_values[1];
     } else if (ins.generate_asm().find("fsqrt.d") != std::string::npos) {
         result = std::sqrt(input_values[0]); // 计算平方根
+    } else if (ins.generate_asm().find("fdiv.d") != std::string::npos) {
+        // 处理浮点除法
+        if (input_values[1] != 0) {  // 防止除以零错误
+            result = input_values[0] / input_values[1];
+        } else {
+            std::cerr << "Error: Division by zero!" << std::endl;
+            result = std::nan("");  // 返回 NaN 表示除以零
+        }
+    } else if (ins.generate_asm().find("fsgnjn.d") != std::string::npos) {
+        // 处理符号取反
+        //result = fsgnjn(input_values[0], input_values[1]);
+        //__asm__ __volatile__(
+        //    "fsgnjn.d %0, %1, %2"       // fsgnjn.d 指令
+        //    : "=f"(result)               // 输出结果到 result，使用浮点寄存器
+        //   : "f"(input_values[0]), "f"(input_values[1])             // 输入 x 和 y，使用浮点寄存器
+        //);
+    } else if (ins.generate_asm().find("feq.d") != std::string::npos) {
+        // 处理浮点数相等比较
+        if (input_values.size() >= 2) {
+            result = (input_values[0] == input_values[1]) ? 1.0 : 0.0;  // 返回 1 或 0
+        } else {
+            std::cerr << "Error: Invalid number of operands for feq.d!" << std::endl;
+            result = std::nan("");  // 返回 NaN 表示无效操作
+        }
+    } else if (ins.generate_asm().find("fcvt.wu.d") != std::string::npos) {
+        // 处理无符号整数转换
+        if (input_values.size() >= 1) {
+            // 转换为无符号整数 (使用 std::llround 防止溢出)
+            unsigned int converted_value = static_cast<unsigned int>(input_values[0]);
+            result = static_cast<double>(converted_value);
+            if (result < 0) {
+                std::cerr << "Error: Conversion overflow!" << std::endl;
+                result = std::numeric_limits<double>::quiet_NaN();  // 返回 NaN 表示溢出
+            }
+        } else {
+            std::cerr << "Error: Invalid number of operands for fcvt.wu.d!" << std::endl;
+            result = std::nan("");  // 返回 NaN 表示无效操作
+        }
     }
 
     // 存储到输出寄存器

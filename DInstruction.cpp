@@ -33,6 +33,15 @@ std::string DInstruction::generate_asm() const {
         asm_code = "fmul.d " + out_regs[0] + ", " + in_regs[0] + ", " + in_regs[1];
     } else if (name == "fsqrt.d") {
         asm_code = "fsqrt.d " + out_regs[0] + ", " + in_regs[0];
+    } else if (name == "fdiv.d") {
+        asm_code = "fdiv.d " + out_regs[0] + ", " + in_regs[0] + ", " + in_regs[1];
+    } else if (name == "feq.d") {
+        asm_code = "feq.d " + out_regs[0] + ", " + in_regs[0] + ", " + in_regs[1];
+    } else if (name == "fsgnjn.d") {
+        asm_code = "fsgnjn.d " + out_regs[0] + ", " + in_regs[0] + ", " + in_regs[1];
+    } else if (name == "fcvt.wu.d") {
+        
+        asm_code = "fcvt.wu.d " + out_regs[0] + ", " + in_regs[0];
     } else {
         throw std::invalid_argument("不支持的指令：" + name);
     }
